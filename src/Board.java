@@ -15,20 +15,10 @@ public class Board extends JPanel implements ActionListener {
     int applesEaten = 0;
     int appleX;
     int appleY;
-
-    public void setDirection(char direction) {
-        this.direction = direction;
-    }
-
-    public char getDirection() {
-        return direction;
-    }
-
     public char direction = 'D';
     boolean isRunning = false;
     Timer timer;
     Random random;
-    ActionListener taskPerformer;
 
     Board() {
         random = new Random();
@@ -47,18 +37,15 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public void createApple() {
-        appleX = random.nextInt((int) (WIDTH / UNIT_SIZE)) * UNIT_SIZE;
-        appleY = random.nextInt((int) (HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+        appleX = random.nextInt((WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+        appleY = random.nextInt((HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
     }
 
     public void draw(Graphics g) {
         g.setColor(Color.red);
         g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
-//        g.setColor(Color.black);
-//        g.fillRect(x[0], y[0], UNIT_SIZE, UNIT_SIZE);
-//        g.setColor(Color.green);
-//        g.fillOval(x[0], y[0], UNIT_SIZE, UNIT_SIZE);
+
         for (int i = 1; i < snakeLength; i++) {
             g.setColor(Color.green);
             g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
