@@ -22,6 +22,7 @@ public class Board extends JPanel implements ActionListener {
     Music startSound = new Music();
     Music beep = new Music();
     Music endSound = new Music();
+    JLabel score = new JLabel("Score: " + applesEaten);
 
     Board() {
         random = new Random();
@@ -29,6 +30,8 @@ public class Board extends JPanel implements ActionListener {
         this.setBackground(Color.GRAY);
         this.setFocusable(true);
         this.addKeyListener(new KeyboardInput());
+        score.setBounds(350,0,200,100);
+        this.add(score);
         startGame();
     }
 
@@ -112,6 +115,7 @@ public class Board extends JPanel implements ActionListener {
             snakeLength++;
             applesEaten++;
             createApple();
+            score.setText("Score: " + applesEaten);
         }
     }
 
