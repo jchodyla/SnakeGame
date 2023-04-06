@@ -19,6 +19,9 @@ public class Board extends JPanel implements ActionListener {
     boolean isRunning = false;
     Timer timer;
     Random random;
+    Music startSound = new Music();
+    Music beep = new Music();
+    Music endSound = new Music();
 
     Board() {
         random = new Random();
@@ -34,6 +37,8 @@ public class Board extends JPanel implements ActionListener {
         isRunning = true;
         createApple();
         timer.start();
+        startSound.setFile("game_start.wav");
+        startSound.play();
     }
 
     public void createApple() {
@@ -81,6 +86,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public void checkCollision() {
+        endSound.setFile("game_over.wav");
+
         if (x[0] < 0 || x[0] > WIDTH)
             isRunning = false;
 
@@ -93,10 +100,15 @@ public class Board extends JPanel implements ActionListener {
                 break;
             }
         }
+
+        if (!isRunning)
+            endSound.play();
     }
 
     public void checkApple() {
+        beep.setFile("beep.wav");
         if (x[0] == appleX && y[0] == appleY) {
+            beep.play();
             snakeLength++;
             applesEaten++;
             createApple();
