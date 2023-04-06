@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.util.Random;
 
 public class Board extends JPanel implements ActionListener {
-    static final int DELAY = 100;
+    static final int DELAY = 210;
     static final int WIDTH = 700;
     static final int HEIGHT = 700;
-    static final int UNIT_SIZE = 20;
+    static final int UNIT_SIZE = 35;
     static final int NUMBER_OF_UNITS = (WIDTH * HEIGHT) / UNIT_SIZE;
     final int[] x = new int[NUMBER_OF_UNITS];
     final int[] y = new int[NUMBER_OF_UNITS];
@@ -27,11 +27,11 @@ public class Board extends JPanel implements ActionListener {
     Board() {
         random = new Random();
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        this.setBackground(Color.GRAY);
+        this.setBackground(Color.BLACK);
         this.setFocusable(true);
         this.addKeyListener(new KeyboardInput());
-        score.setBounds(350,0,200,100);
         this.add(score);
+        score.setSize(40,20);
         startGame();
     }
 
@@ -47,16 +47,21 @@ public class Board extends JPanel implements ActionListener {
     public void createApple() {
         appleX = random.nextInt((WIDTH / UNIT_SIZE)) * UNIT_SIZE;
         appleY = random.nextInt((HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+
+        for (int i = 0; i < snakeLength; i++) {
+            if (appleX == x[i] && appleY == y[i]) {
+                createApple();
+            }
+        }
     }
 
     public void draw(Graphics g) {
         g.setColor(Color.red);
         g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
-
         for (int i = 1; i < snakeLength; i++) {
-            g.setColor(Color.green);
-            g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+            g.setColor(Color.GREEN);
+            g.fillRect(x[i], y[i], UNIT_SIZE - 1, UNIT_SIZE - 1);
         }
     }
 
@@ -70,6 +75,7 @@ public class Board extends JPanel implements ActionListener {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
         }
+
         switch (direction) {
             case 'U' -> y[0] = y[0] - UNIT_SIZE;
             case 'D' -> y[0] = y[0] + UNIT_SIZE;
@@ -84,6 +90,8 @@ public class Board extends JPanel implements ActionListener {
             move();
             checkApple();
             checkCollision();
+        } else {
+            endSound.play();
         }
         repaint();
     }
@@ -91,10 +99,10 @@ public class Board extends JPanel implements ActionListener {
     public void checkCollision() {
         endSound.setFile("game_over.wav");
 
-        if (x[0] < 0 || x[0] > WIDTH)
+        if (x[0] < 0 || x[0] >= WIDTH)
             isRunning = false;
 
-        if (y[0] < 0 || y[0] > HEIGHT)
+        if (y[0] < 0 || y[0] >= HEIGHT)
             isRunning = false;
 
         for (int i = 1; i < snakeLength; i++) {
@@ -103,9 +111,6 @@ public class Board extends JPanel implements ActionListener {
                 break;
             }
         }
-
-        if (!isRunning)
-            endSound.play();
     }
 
     public void checkApple() {
@@ -117,27 +122,30 @@ public class Board extends JPanel implements ActionListener {
             createApple();
             score.setText("Score: " + applesEaten);
         }
+        if (applesEaten == NUMBER_OF_UNITS - 5) {
+            isRunning = false;
+        }
     }
 
     public class KeyboardInput extends KeyAdapter {
         public void keyPressed(KeyEvent e) {
             switch (e.getKeyCode()) {
-                case KeyEvent.VK_LEFT -> {
+                case KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
                     if (direction != 'R') {
                         direction = 'L';
                     }
                 }
-                case KeyEvent.VK_RIGHT -> {
+                case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
                     if (direction != 'L') {
                         direction = 'R';
                     }
                 }
-                case KeyEvent.VK_UP -> {
+                case KeyEvent.VK_UP, KeyEvent.VK_W -> {
                     if (direction != 'D') {
                         direction = 'U';
                     }
                 }
-                case KeyEvent.VK_DOWN -> {
+                case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
                     if (direction != 'U') {
                         direction = 'D';
                     }
