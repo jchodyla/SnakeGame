@@ -28,7 +28,6 @@ public class Board extends JPanel implements ActionListener {
     boolean gameStarted = false;
     JLabel gameOverLabel = new JLabel("Game Over");
     JButton restartButton = new JButton("Play again");
-    boolean restarted = false;
 
     Board() {
         random = new Random();
@@ -66,12 +65,13 @@ public class Board extends JPanel implements ActionListener {
         this.remove(restartButton);
         this.remove(gameOverLabel);
         snakeLength = 5;
-        x[0] = 0;
-        y[0] = 0;
+        for (int i = 0; i < NUMBER_OF_UNITS; i++) {
+            x[i] = 0;
+            y[i] = 0;
+        }
         direction = 'D';
         applesEaten = 0;
         scoreLabel.setText("Score: " + applesEaten);
-        restarted = false;
     }
 
     public void createApple() {
@@ -86,8 +86,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g) {
-        if (restarted)
-            return;
         g.setColor(Color.red);
         g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
@@ -104,8 +102,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public void move() {
-        if (restarted)
-            return;
         for (int i = snakeLength; i > 0; i--) {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
@@ -208,9 +204,6 @@ public class Board extends JPanel implements ActionListener {
         restartButton.setFont(new Font("Arial", Font.PLAIN, 30));
         this.add(gameOverLabel);
         this.add(restartButton);
-        restartButton.addActionListener(g -> {
-            restarted = true;
-            restart();
-        });
+        restartButton.addActionListener(g -> restart());
     }
 }
