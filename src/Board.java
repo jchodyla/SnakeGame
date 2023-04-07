@@ -20,28 +20,58 @@ public class Board extends JPanel implements ActionListener {
     Timer timer;
     Random random;
     Music startSound = new Music();
-    Music beep = new Music();
+    Music beepSound = new Music();
     Music endSound = new Music();
-    JLabel score = new JLabel("Score: " + applesEaten);
+    JLabel scoreLabel = new JLabel("Score: " + applesEaten);
+    JLabel startLabel = new JLabel("Snake Game");
+    JButton startButton = new JButton("Play");
+    boolean gameStarted = false;
+    JLabel gameOverLabel = new JLabel("Game Over");
+    JButton restartButton = new JButton("Play again");
+    boolean restarted = false;
 
     Board() {
         random = new Random();
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        this.setBackground(Color.BLACK);
+        this.setBackground(Color.WHITE);
         this.setFocusable(true);
         this.addKeyListener(new KeyboardInput());
-        this.add(score);
-        score.setSize(40,20);
-        startGame();
+        this.setLayout(null);
+        gameStartScreen();
     }
 
     public void startGame() {
+        this.setBackground(Color.BLACK);
         timer = new Timer(DELAY, this);
         isRunning = true;
         createApple();
         timer.start();
         startSound.setFile("game_start.wav");
         startSound.play();
+        this.remove(startLabel);
+        this.remove(startButton);
+        scoreLabel.setBounds(310,5,400,20);
+        scoreLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+        scoreLabel.setForeground(Color.WHITE);
+        this.add(scoreLabel);
+        gameStarted = true;
+    }
+
+    public void restart() {
+        this.setBackground(Color.BLACK);
+        timer.start();
+        createApple();
+        isRunning = true;
+        gameStarted = true;
+        this.remove(restartButton);
+        this.remove(gameOverLabel);
+        snakeLength = 5;
+        x[0] = 0;
+        y[0] = 0;
+        direction = 'D';
+        applesEaten = 0;
+        scoreLabel.setText("Score: " + applesEaten);
+        restarted = false;
     }
 
     public void createApple() {
@@ -56,6 +86,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g) {
+        if (restarted)
+            return;
         g.setColor(Color.red);
         g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
@@ -67,10 +99,13 @@ public class Board extends JPanel implements ActionListener {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        draw(g);
+        if (gameStarted)
+            draw(g);
     }
 
     public void move() {
+        if (restarted)
+            return;
         for (int i = snakeLength; i > 0; i--) {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
@@ -92,6 +127,7 @@ public class Board extends JPanel implements ActionListener {
             checkCollision();
         } else {
             endSound.play();
+            gameOverScreen();
         }
         repaint();
     }
@@ -114,13 +150,13 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public void checkApple() {
-        beep.setFile("beep.wav");
+        beepSound.setFile("beep.wav");
         if (x[0] == appleX && y[0] == appleY) {
-            beep.play();
+            beepSound.play();
             snakeLength++;
             applesEaten++;
             createApple();
-            score.setText("Score: " + applesEaten);
+            scoreLabel.setText("Score: " + applesEaten);
         }
         if (applesEaten == NUMBER_OF_UNITS - 5) {
             isRunning = false;
@@ -152,6 +188,29 @@ public class Board extends JPanel implements ActionListener {
                 }
             }
         }
+    }
 
+    public void gameStartScreen() {
+        startLabel.setBounds(200,100,400,100);
+        startButton.setBounds(250,300,200,100);
+        startLabel.setFont(new Font("Arial", Font.PLAIN, 50));
+        startButton.setFont(new Font("Arial", Font.PLAIN, 30));
+        this.add(startLabel);
+        this.add(startButton);
+        startButton.addActionListener(f -> startGame());
+    }
+
+    public void gameOverScreen() {
+        gameOverLabel.setBounds(220,100,400,100);
+        restartButton.setBounds(250,300,200,100);
+        gameOverLabel.setFont(new Font("Arial", Font.PLAIN, 50));
+        gameOverLabel.setForeground(Color.WHITE);
+        restartButton.setFont(new Font("Arial", Font.PLAIN, 30));
+        this.add(gameOverLabel);
+        this.add(restartButton);
+        restartButton.addActionListener(g -> {
+            restarted = true;
+            restart();
+        });
     }
 }
